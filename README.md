@@ -11,7 +11,7 @@ Test task for Elixir developers. Candidate should write simple banking OTP appli
 - `ExUnit` should be used for writing tests.
 - Application should have 100% test coverage.
 - Application should `not` use any database / disc storage. All needed data should be stored only in application memory.
-- Candidate can use any Elixir or Erlang library he wants.
+- Candidate can use any Elixir or Erlang library he/she wants.
 
 ### Money amounts
 
