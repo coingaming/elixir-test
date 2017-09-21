@@ -28,8 +28,8 @@ Requirements for public functions provided by `ExBanking` module. Any function s
     :user_already_exists            |
     :user_does_not_exist            |
     :not_enough_money               |
-    :sender_does_not_exist            |
-    :receiver_does_not_exist          |
+    :sender_does_not_exist          |
+    :receiver_does_not_exist        |
     :too_many_requests_to_user      |
     :too_many_requests_to_sender    |
     :too_many_requests_to_receiver
