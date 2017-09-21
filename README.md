@@ -32,7 +32,9 @@ Requirements for public functions provided by `ExBanking` module. Any function s
     :not_enough_money        |
     :sender_is_not_exist     |
     :receiver_is_not_exist   |
-    :user_is_overloaded
+    :user_is_overloaded      |
+    :sender_is_overloaded    |
+    :receiver_is_overloaded
   }
 ```
 
