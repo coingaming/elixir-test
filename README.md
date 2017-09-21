@@ -45,7 +45,7 @@ Requirements for public functions provided by `ExBanking` module. Any function s
 
 *@spec remove_user(user :: String.t) :: :ok | banking_error*
 
-- Function totally removes user from the system
+- Function totally removes user (and his money) from the system
 
 *@spec deposit(user :: String.t, amount :: number, currency :: String.t) :: {:ok, new_balance :: number} | banking_error*
 
