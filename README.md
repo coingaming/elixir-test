@@ -9,7 +9,7 @@ Test task for Elixir developers. Candidate should write simple banking OTP appli
 - Application name is `:ex_banking` (main Elixir module is `ExBanking`).
 - Application interface is just set of public functions of `ExBanking` module (no API endpoint, no REST / SOAP API etc ..).
 - Application should `not` use any database / disc storage. All needed data should be stored only in application memory.
-- Candidate can use any Elixir or Erlang library he wants.
+- Candidate can use any Elixir or Erlang library he/she wants.
 
 ### Money amounts
 
