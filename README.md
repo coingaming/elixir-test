@@ -69,4 +69,4 @@ Requirements for public functions provided by `ExBanking` module. Any function s
 
 ### Performance
 
-In every single moment of time the system should handle 10 or less operations for every individual user. If there is any new operation for user and he still has 10 operations in pending state - new operation should immediately return `user_is_overloaded` error until number of requests for this user decreases < 10.
+In every single moment of time the system should handle 10 or less operations for every individual user (it means user is string passed as first argument to API functions). If there is any new operation for user and he still has 10 operations in pending state - new operation should immediately return `user_is_overloaded` error until number of requests for this user decreases < 10.
