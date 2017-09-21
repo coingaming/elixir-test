@@ -63,4 +63,4 @@ Requirements for public functions provided by `ExBanking` module. Any function s
 
 ### Performance
 
-In every single moment of time the system should handle 10 or less operations for every individual user (user is a string passed as the first argument to API functions). If there is any new operation for a user and he/she still has 10 operations in pending state - new operation should immediately return `too_many_requests_to_user` error until number of requests for this user decreases < 10.
+In every single moment of time the system should handle 10 or less operations for every individual user (user is a string passed as the first argument to API functions). If there is any new operation for this user and he/she still has 10 operations in pending state - new operation for this user should immediately return `too_many_requests_to_user` error until number of requests for this user decreases < 10.
