@@ -9,14 +9,17 @@ Test task for Elixir developers. Candidate should write a simple banking OTP app
 - Application name is `:ex_banking` (main Elixir module is `ExBanking`).
 - Application interface is just set of public functions of `ExBanking` module (no API endpoint, no REST / SOAP API, no TCP / UDP sockets, no any external network interface).
 - Application should `not` use any database / disc storage. All needed data should be stored only in application memory.
-- Candidate can use any Elixir or Erlang library he/she wants to.
+- Candidate can use any Elixir or Erlang library he/she wants to (but app can be written in pure Elixir / Erlang / OTP).
+- Solution will be tested using our auto-tests for this task. So, please follow specifications accurately.
+- Public functions of `ExBanking` module described in this document are only one thing is tested inside our auto-tests. If is needed to call something else for normal application work - probably tests will fail.
+- Accuracy of code is also matter. Readable, safe, refactorable code is a plus.
 
 ### Money amounts
 
 - Money amount of any currency should `not` be negative.
 - Application should provide `2 decimal` precision of money amount for any currency.
 - Amount of money incoming to the system should be equal to amount of money inside the system + amount of withdraws (money should not appear or disappear accidentally).
-- User and currency type is any string. Case sensitive. New currencies / users can be added dynamically in runtime.
+- User and currency type is any string. Case sensitive. New currencies / users can be added dynamically in runtime. For creating users in application should be special public function (described below). Currencies should be created automatically (if it needed).
 
 ### API reference
 
