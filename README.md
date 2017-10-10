@@ -12,7 +12,7 @@ Test task for Elixir developers. Candidate should write a simple banking OTP app
 - Candidate can use any Elixir or Erlang library he/she wants to (but app can be written in pure Elixir / Erlang / OTP).
 - Solution will be tested using our auto-tests for this task. So, please follow specifications accurately.
 - Public functions of `ExBanking` module described in this document is `the only one` thing tested by our auto-tests. If anything else needs to be called for normal application functioning then probably tests will fail.
-- Accuracy of code is also matter. Readable, safe, refactorable code is a plus.
+- Code accuracy also matters. Readable, safe, refactorable code is a plus.
 
 ### Money amounts
 
