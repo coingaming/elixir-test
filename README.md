@@ -19,7 +19,7 @@ Test task for Elixir developers. Candidate should write a simple banking OTP app
 - Money amount of any currency should `not` be negative.
 - Application should provide `2 decimal` precision of money amount for any currency.
 - Amount of money incoming to the system should be equal to amount of money inside the system + amount of withdraws (money should not appear or disappear accidentally).
-- User and currency type is any string. Case sensitive. New currencies / users can be added dynamically in runtime. For creating users in application should be special public function (described below). Currencies should be created automatically (if it needed).
+- User and currency type is any string. Case sensitive. New currencies / users can be added dynamically in runtime. In the application, there should be a special public function (described below) for creating users. Currencies should be created automatically (if needed).
 
 ### API reference
 
