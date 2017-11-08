@@ -74,5 +74,12 @@ Requirements for public functions provided by `ExBanking` module. Any function s
 
 - Completed Elixir test tasks can be sent to **HR@heathmont.net**
 
-<!-- Google Analytics -->
-<img src="//www.google-analytics.com/__utm.gif?utmac=UA-109361792-1"/>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-109361792-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109361792-1');
+</script>
