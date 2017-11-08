@@ -75,4 +75,4 @@ Requirements for public functions provided by `ExBanking` module. Any function s
 - Completed Elixir test tasks can be sent to **HR@heathmont.net**
 
 <!-- Google Analytics -->
-<img src="//nojsstats.appspot.com/UA-109361792-1/heathmont.github.io"/>
+<img src="//www.google-analytics.com/__utm.gif?utmac=UA-109361792-1"/>
