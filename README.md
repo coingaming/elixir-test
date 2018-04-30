@@ -39,7 +39,7 @@ Requirements for public functions provided by `ExBanking` module. Any function s
   }
 ```
 
-*@spec create_user(user :: String.t) :: :ok | banking_error*
+*@spec create_user(user :: String.t) :: :ok \| banking_error*
 
 - Function creates new user in the system
 - New user has zero balance of any currency
