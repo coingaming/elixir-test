@@ -2,6 +2,8 @@ defmodule ExBanking do
   @moduledoc """
   ExBanking simple banking OTP application.
   """
+  alias ExBanking.Registry
+
   @typdoc """
   Defining custom type for functions with error result
   """
@@ -17,10 +19,19 @@ defmodule ExBanking do
            | :too_many_requests_to_sender
            | :too_many_requests_to_receiver}
 
+  @name ExBanking
+
+  def start(_type, _args) do
+    Registry.start_link(name: @name)
+  end
+
   @spec create_user(user :: String.t()) :: :ok | banking_error
   def create_user(user) do
-    # TODO implement it
-    :ok
+    case Registry.create(@name, user) do
+      :ok -> :ok
+      :user_already_exists -> {:error, :user_already_exists}
+      _ -> {:error, :wrong_arguments}
+    end
   end
 
   @spec deposit(user :: String.t(), amount :: number, currency :: String.t()) ::
