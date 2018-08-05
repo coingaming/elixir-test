@@ -1,6 +1,7 @@
 defmodule ExBanking.Registry do
   use GenServer
   alias ExBanking.Bucket
+  require IEx
 
   ## Client API
 
@@ -21,6 +22,20 @@ defmodule ExBanking.Registry do
     GenServer.call(server, {:create, name})
   end
 
+  @doc """
+  Increase balance in the user account
+  """
+  def deposit(server, name, amount, currency) do
+    GenServer.call(server, {:deposit, name, amount, currency})
+  end
+
+  @doc """
+  Get the balance for the user and currency specified
+  """
+  def get_balance(server, name, currency) do
+    GenServer.call(server, {:get_balance, name, currency})
+  end
+
   ## Server Callbacks
 
   @impl true
@@ -31,9 +46,47 @@ defmodule ExBanking.Registry do
   end
 
   @impl true
+  def handle_call({:get_balance, name, currency}, _from, {accounts, _refs} = state) do
+    case Map.fetch(accounts, name) do
+      {:ok, pid} ->
+        case Bucket.get(pid, currency) do
+          nil ->
+            {:reply, {:ok, 0.00}, state}
+
+          balance ->
+            {:reply, {:ok, balance}, state}
+        end
+
+      _ ->
+        {:reply, {:error, :user_does_not_exist}, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:deposit, name, amount, currency}, _from, {accounts, refs}) do
+    # try find the user account
+    case Map.fetch(accounts, name) do
+      {:ok, pid} ->
+        # find and update the balance in the specified currency for this user account
+        balance =
+          case Bucket.get(pid, currency) do
+            nil -> Float.round(amount, 2)
+            current_balance -> Float.round(current_balance + amount, 2)
+          end
+
+        # update user balance
+        Bucket.put(pid, currency, balance)
+        {:reply, {:ok, balance}, {accounts, refs}}
+
+      :error ->
+        {:reply, {:error, :user_does_not_exist}, {accounts, refs}}
+    end
+  end
+
+  @impl true
   def handle_call({:create, name}, _from, {accounts, refs}) do
     if Map.has_key?(accounts, name) do
-      {:reply, :user_already_exists, {accounts, refs}}
+      {:reply, {:error, :user_already_exists}, {accounts, refs}}
     else
       {:ok, pid} = Bucket.start_link(%{})
       # monitor for process stop
@@ -45,10 +98,6 @@ defmodule ExBanking.Registry do
     end
   end
 
-  @doc """
-  Mantain registry up to date, when a bucket (Agent) stop for any reason
-  should be also deleted from the registry
-  """
   @impl true
   def handle_info({:DOWN, ref, :process, _pid, _reason}, {accounts, refs}) do
     {name, refs} = Map.pop(refs, ref)
@@ -56,9 +105,6 @@ defmodule ExBanking.Registry do
     {:noreply, {accounts, refs}}
   end
 
-  @doc """
-  Any other message received do nothing
-  """
   @impl true
   def handle_info(_msg, state) do
     {:noreply, state}

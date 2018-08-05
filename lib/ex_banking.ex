@@ -4,7 +4,7 @@ defmodule ExBanking do
   """
   alias ExBanking.Registry
 
-  @typdoc """
+  @typedoc """
   Defining custom type for functions with error result
   """
   @type banking_error ::
@@ -27,18 +27,21 @@ defmodule ExBanking do
 
   @spec create_user(user :: String.t()) :: :ok | banking_error
   def create_user(user) do
-    case Registry.create(@name, user) do
-      :ok -> :ok
-      :user_already_exists -> {:error, :user_already_exists}
-      _ -> {:error, :wrong_arguments}
+    if not is_binary(user) do
+      {:error, :wrong_arguments}
     end
+
+    Registry.create(@name, user)
   end
 
   @spec deposit(user :: String.t(), amount :: number, currency :: String.t()) ::
           {:ok, new_balance :: number} | banking_error
   def deposit(user, amount, currency) do
-    # TODO implement it
-    {:ok, 0.0}
+    if not is_number(amount) or amount < 0 do
+      {:error, :wrong_arguments}
+    end
+
+    Registry.deposit(@name, user, amount / 1, currency)
   end
 
   @spec withdraw(user :: String.t(), amount :: number, currency :: String.t()) ::
@@ -51,8 +54,7 @@ defmodule ExBanking do
   @spec get_balance(user :: String.t(), currency :: String.t()) ::
           {:ok, balance :: number} | banking_error
   def get_balance(user, currency) do
-    # TODO implement it
-    {:ok, 0.0}
+    Registry.get_balance(@name, user, currency)
   end
 
   @spec send(
