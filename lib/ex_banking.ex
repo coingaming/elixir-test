@@ -47,8 +47,7 @@ defmodule ExBanking do
   @spec withdraw(user :: String.t(), amount :: number, currency :: String.t()) ::
           {:ok, new_balance :: number} | banking_error
   def withdraw(user, amount, currency) do
-    # TODO implement it, becarefull when subtract amount, should not allow negatives
-    {:ok, 0.0}
+    Registry.withdraw(@name, user, amount, currency)
   end
 
   @spec get_balance(user :: String.t(), currency :: String.t()) ::

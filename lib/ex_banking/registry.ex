@@ -36,6 +36,13 @@ defmodule ExBanking.Registry do
     GenServer.call(server, {:get_balance, name, currency})
   end
 
+  @doc """
+  Withdraw the specified amount from the user balance in the specified currency
+  """
+  def withdraw(server, name, amount, currency) do
+    GenServer.call(server, {:withdaw, name, amount, currency})
+  end
+
   ## Server Callbacks
 
   @impl true
@@ -43,6 +50,28 @@ defmodule ExBanking.Registry do
     refs = %{}
     accounts = %{}
     {:ok, {accounts, refs}}
+  end
+
+  @impl true
+  def handle_call({:withdaw, name, amount, currency}, _from, {accounts, _refs} = state) do
+    case Map.fetch(accounts, name) do
+      {:ok, pid} ->
+        case Bucket.get(pid, currency) do
+          nil ->
+            {:reply, {:error, :not_enough_money}, state}
+
+          balance when balance >= amount ->
+            new_balance = Float.round(balance - amount, 2)
+            Bucket.put(pid, currency, new_balance)
+            {:reply, {:ok, new_balance}, state}
+
+          _balance ->
+            {:reply, {:error, :not_enough_money}, state}
+        end
+
+      _ ->
+        {:reply, {:error, :user_does_not_exist}, state}
+    end
   end
 
   @impl true
