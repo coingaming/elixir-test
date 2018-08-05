@@ -86,4 +86,12 @@ defmodule ExBankingTest do
     assert ExBanking.send("user10", "user11", 100, "usd") ==
              {:error, :too_many_requests_to_receiver}
   end
+
+  test "negative amount not allowed" do
+    ExBanking.create_user("user13")
+    ExBanking.create_user("user14")
+    assert ExBanking.deposit("user13", -1, "usd") == {:error, :wrong_arguments}
+    assert ExBanking.send("user13", "user14", -10, "usd") == {:error, :wrong_arguments}
+    assert ExBanking.withdraw("user13", -10, "usd") == {:error, :wrong_arguments}
+  end
 end

@@ -41,15 +41,19 @@ defmodule ExBanking do
   def deposit(user, amount, currency) do
     if not is_number(amount) or amount < 0 do
       {:error, :wrong_arguments}
+    else
+      Registry.deposit(@name, user, amount / 1, currency)
     end
-
-    Registry.deposit(@name, user, amount / 1, currency)
   end
 
   @spec withdraw(user :: String.t(), amount :: number, currency :: String.t()) ::
           {:ok, new_balance :: number} | banking_error
   def withdraw(user, amount, currency) do
-    Registry.withdraw(@name, user, amount, currency)
+    if not is_number(amount) or amount < 0 do
+      {:error, :wrong_arguments}
+    else
+      Registry.withdraw(@name, user, amount, currency)
+    end
   end
 
   @spec get_balance(user :: String.t(), currency :: String.t()) ::
@@ -65,6 +69,10 @@ defmodule ExBanking do
           currency :: String.t()
         ) :: {:ok, from_user_balance :: number, to_user_balance :: number} | banking_error
   def send(from_user, to_user, amount, currency) do
-    Registry.send(@name, from_user, to_user, amount / 1, currency)
+    if not is_number(amount) or amount < 0 do
+      {:error, :wrong_arguments}
+    else
+      Registry.send(@name, from_user, to_user, amount / 1, currency)
+    end
   end
 end
