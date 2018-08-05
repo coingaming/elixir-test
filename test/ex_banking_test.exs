@@ -35,8 +35,17 @@ defmodule ExBankingTest do
     assert ExBanking.get_balance("user4", "usd") == {:error, :user_does_not_exist}
   end
 
-  test "withdraw" do
-    assert ExBanking.withdraw("user1", 0.0, "usd") == {:ok, 0.0}
+  test "withdrawal of the user bank account" do
+    assert ExBanking.create_user("user6") == :ok
+    deposit_amount = 10
+    withdraw_amount = 5
+    assert ExBanking.withdraw("user6", withdraw_amount, "usd") == {:error, :not_enough_money}
+    assert ExBanking.deposit("user6", deposit_amount, "usd") == {:ok, deposit_amount}
+    balance = Float.round(deposit_amount / 1 - withdraw_amount, 2)
+    assert ExBanking.withdraw("user6", withdraw_amount, "usd") == {:ok, balance}
+    assert ExBanking.get_balance("user6", "usd") == {:ok, balance}
+    assert ExBanking.get_balance("user6", "eur") == {:ok, 0.0}
+    assert ExBanking.withdraw("user10", withdraw_amount, "usd") == {:error, :user_does_not_exist}
   end
 
   test "send" do
