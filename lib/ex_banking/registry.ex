@@ -4,6 +4,8 @@ defmodule ExBanking.Registry do
   require IEx
 
   ## Client API
+  @tab :counter_requests
+  @max_requests 10
 
   @doc """
   Starts the registry with te given options
@@ -26,34 +28,80 @@ defmodule ExBanking.Registry do
   Increase balance in the user account
   """
   def deposit(server, name, amount, currency) do
-    GenServer.call(server, {:deposit, name, amount, currency})
+    case limiter_requests(name, 1) do
+      :ok ->
+        reply = GenServer.call(server, {:deposit, name, amount, currency})
+        limiter_requests(name, -1)
+        reply
+
+      reply ->
+        limiter_requests(name, -1)
+        reply
+    end
   end
 
   @doc """
   Get the balance for the user and currency specified
   """
   def get_balance(server, name, currency) do
-    GenServer.call(server, {:get_balance, name, currency})
+    case limiter_requests(name, 1) do
+      :ok ->
+        reply = GenServer.call(server, {:get_balance, name, currency})
+        limiter_requests(name, -1)
+        reply
+
+      reply ->
+        limiter_requests(name, -1)
+        reply
+    end
   end
 
   @doc """
   Withdraw the specified amount from the user balance in the specified currency
   """
   def withdraw(server, name, amount, currency) do
-    GenServer.call(server, {:withdaw, name, amount, currency})
+    case limiter_requests(name, 1) do
+      :ok ->
+        reply = GenServer.call(server, {:withdaw, name, amount, currency})
+        limiter_requests(name, -1)
+        reply
+
+      reply ->
+        limiter_requests(name, -1)
+        reply
+    end
   end
 
   @doc """
   Transfer money between users
   """
   def send(server, from, to, amount, currency) do
-    GenServer.call(server, {:send, from, to, amount, currency}, :infinity)
+    case limiter_requests(from, 1) do
+      :ok ->
+        GenServer.call(server, {:send, from, to, amount, currency}, :infinity)
+        limiter_requests(from, -1)
+
+      reply ->
+        limiter_requests(from, -1)
+        reply
+    end
+  end
+
+  @doc """
+  Limit quantity of requests per moment
+  """
+  def limiter_requests(user, incr) do
+    case :ets.update_counter(@tab, user, {2, incr}, {user, 0}) do
+      count when count > @max_requests -> {:error, :too_many_requests_to_user}
+      _count -> :ok
+    end
   end
 
   ## Server Callbacks
 
   @impl true
   def init(_) do
+    :ets.new(@tab, [:set, :named_table, :public, read_concurrency: true, write_concurrency: true])
     refs = %{}
     accounts = %{}
     {:ok, {accounts, refs}}
@@ -72,7 +120,7 @@ defmodule ExBanking.Registry do
               {:ok, pid_to} ->
                 new_balance_to =
                   case Bucket.get(pid_to, currency) do
-                    nil -> amount
+                    nil -> Float.round(amount, 2)
                     balance -> Float.round(balance + amount, 2)
                   end
 

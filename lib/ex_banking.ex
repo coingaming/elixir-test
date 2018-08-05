@@ -63,6 +63,6 @@ defmodule ExBanking do
           currency :: String.t()
         ) :: {:ok, from_user_balance :: number, to_user_balance :: number} | banking_error
   def send(from_user, to_user, amount, currency) do
-    Registry.send(@name, from_user, to_user, amount, currency)
+    Registry.send(@name, from_user, to_user, amount / 1, currency)
   end
 end
