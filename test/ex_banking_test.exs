@@ -21,18 +21,18 @@ defmodule ExBankingTest do
   end
 
   test "deposit for a user that does not exist" do
-    assert ExBanking.deposit("user4", 10, "usd") == {:error, :user_does_not_exist}
+    assert ExBanking.deposit("user3", 10, "usd") == {:error, :user_does_not_exist}
   end
 
   test "get balance" do
-    assert ExBanking.create_user("user3") == :ok
+    assert ExBanking.create_user("user4") == :ok
     balance = Float.round(3.789, 2)
-    assert ExBanking.deposit("user3", 3.789, "usd") == {:ok, balance}
-    assert ExBanking.get_balance("user3", "usd") == {:ok, balance}
+    assert ExBanking.deposit("user4", 3.789, "usd") == {:ok, balance}
+    assert ExBanking.get_balance("user4", "usd") == {:ok, balance}
   end
 
   test "get balance for a user that does not exists" do
-    assert ExBanking.get_balance("user4", "usd") == {:error, :user_does_not_exist}
+    assert ExBanking.get_balance("user5", "usd") == {:error, :user_does_not_exist}
   end
 
   test "withdrawal of the user bank account" do
@@ -45,7 +45,7 @@ defmodule ExBankingTest do
     assert ExBanking.withdraw("user6", withdraw_amount, "usd") == {:ok, balance}
     assert ExBanking.get_balance("user6", "usd") == {:ok, balance}
     assert ExBanking.get_balance("user6", "eur") == {:ok, 0.0}
-    assert ExBanking.withdraw("user10", withdraw_amount, "usd") == {:error, :user_does_not_exist}
+    assert ExBanking.withdraw("user7", withdraw_amount, "usd") == {:error, :user_does_not_exist}
   end
 
   test "send" do
@@ -61,5 +61,29 @@ defmodule ExBankingTest do
     assert ExBanking.send("user_from", "user_to", 5.0, "usd") == {:ok, 15.0, 5.0}
     assert ExBanking.get_balance("user_from", "usd") == {:ok, 15.0}
     assert ExBanking.get_balance("user_to", "usd") == {:ok, 5.0}
+  end
+
+  test "limit requests" do
+    ExBanking.create_user("user8")
+    1..800_000 |> Enum.each(fn _ -> spawn(fn -> ExBanking.deposit("user8", 1, "usd") end) end)
+    assert ExBanking.get_balance("user8", "usd") == {:error, :too_many_requests_to_user}
+    ExBanking.create_user("user9")
+    assert ExBanking.get_balance("user9", "usd") == {:ok, 0.0}
+  end
+
+  test "limit transfer request" do
+    ExBanking.create_user("user10")
+    ExBanking.create_user("user11")
+    # Test limit request fof sender
+    1..800_000 |> Enum.each(fn _ -> spawn(fn -> ExBanking.deposit("user10", 1, "usd") end) end)
+
+    assert ExBanking.send("user10", "user11", 100, "usd") ==
+             {:error, :too_many_requests_to_sender}
+
+    # Test lmit request for receiver
+    1..800_000 |> Enum.each(fn _ -> spawn(fn -> ExBanking.deposit("user11", 1, "usd") end) end)
+
+    assert ExBanking.send("user10", "user11", 100, "usd") ==
+             {:error, :too_many_requests_to_receiver}
   end
 end

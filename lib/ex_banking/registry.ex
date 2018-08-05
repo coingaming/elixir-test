@@ -78,12 +78,22 @@ defmodule ExBanking.Registry do
   def send(server, from, to, amount, currency) do
     case limiter_requests(from, 1) do
       :ok ->
-        GenServer.call(server, {:send, from, to, amount, currency}, :infinity)
-        limiter_requests(from, -1)
+        case limiter_requests(to, 1) do
+          :ok ->
+            reply = GenServer.call(server, {:send, from, to, amount, currency}, :infinity)
+            limiter_requests(to, -1)
+            limiter_requests(from, -1)
+            reply
 
-      reply ->
+          _reply ->
+            limiter_requests(to, -1)
+            limiter_requests(from, -1)
+            {:error, :too_many_requests_to_receiver}
+        end
+
+      _reply ->
         limiter_requests(from, -1)
-        reply
+        {:error, :too_many_requests_to_sender}
     end
   end
 
