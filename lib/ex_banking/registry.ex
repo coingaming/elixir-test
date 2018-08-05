@@ -18,6 +18,13 @@ defmodule ExBanking.Registry do
   end
 
   @doc """
+  Retreive bucket by name
+  """
+  def lookup(server, name) do
+    GenServer.call(server, {:lookup, name})
+  end
+
+  @doc """
   Creates a new bank account for user
   """
   def create(server, name) do
@@ -62,7 +69,7 @@ defmodule ExBanking.Registry do
   def withdraw(server, name, amount, currency) do
     case limiter_requests(name, 1) do
       :ok ->
-        reply = GenServer.call(server, {:withdaw, name, amount, currency})
+        reply = GenServer.call(server, {:withdraw, name, amount, currency})
         limiter_requests(name, -1)
         reply
 
@@ -153,7 +160,7 @@ defmodule ExBanking.Registry do
   end
 
   @impl true
-  def handle_call({:withdaw, name, amount, currency}, _from, {accounts, _refs} = state) do
+  def handle_call({:withdraw, name, amount, currency}, _from, {accounts, _refs} = state) do
     case Map.fetch(accounts, name) do
       {:ok, pid} ->
         case Bucket.get(pid, currency) do
@@ -224,6 +231,17 @@ defmodule ExBanking.Registry do
       refs = Map.put(refs, ref, name)
       accounts = Map.put(accounts, name, pid)
       {:reply, :ok, {accounts, refs}}
+    end
+  end
+
+  @impl true
+  def handle_call({:lookup, name}, _from, {accounts, _refs} = state) do
+    case Map.fetch(accounts, name) do
+      {:ok, pid} ->
+        {:reply, pid, state}
+
+      :error ->
+        {:reply, :error, state}
     end
   end
 

@@ -1,5 +1,5 @@
 defmodule ExBanking.Bucket do
-  use Agent
+  use Agent, restart: :temporary
 
   @doc """
   Starts a ew bucket

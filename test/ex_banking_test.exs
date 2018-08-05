@@ -1,5 +1,5 @@
 defmodule ExBankingTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
   require IEx
   doctest ExBanking
 

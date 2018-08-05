@@ -2,6 +2,7 @@ defmodule ExBanking do
   @moduledoc """
   ExBanking simple banking OTP application.
   """
+  use Application
   alias ExBanking.Registry
 
   @typedoc """
@@ -19,10 +20,11 @@ defmodule ExBanking do
            | :too_many_requests_to_sender
            | :too_many_requests_to_receiver}
 
-  @name ExBanking
+  @name ExBanking.Registry
 
+  @impl true
   def start(_type, _args) do
-    Registry.start_link(name: @name)
+    ExBanking.Supervisor.start_link([])
   end
 
   @spec create_user(user :: String.t()) :: :ok | banking_error
