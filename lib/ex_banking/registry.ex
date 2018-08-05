@@ -43,6 +43,13 @@ defmodule ExBanking.Registry do
     GenServer.call(server, {:withdaw, name, amount, currency})
   end
 
+  @doc """
+  Transfer money between users
+  """
+  def send(server, from, to, amount, currency) do
+    GenServer.call(server, {:send, from, to, amount, currency}, :infinity)
+  end
+
   ## Server Callbacks
 
   @impl true
@@ -50,6 +57,41 @@ defmodule ExBanking.Registry do
     refs = %{}
     accounts = %{}
     {:ok, {accounts, refs}}
+  end
+
+  @impl true
+  def handle_call({:send, from, to, amount, currency}, _from, {accounts, _refs} = state) do
+    case Map.fetch(accounts, from) do
+      {:ok, pid_from} ->
+        case Bucket.get(pid_from, currency) do
+          nil ->
+            {:reply, {:error, :not_enough_money}, state}
+
+          balance when balance >= amount ->
+            case Map.fetch(accounts, to) do
+              {:ok, pid_to} ->
+                new_balance_to =
+                  case Bucket.get(pid_to, currency) do
+                    nil -> amount
+                    balance -> Float.round(balance + amount, 2)
+                  end
+
+                Bucket.put(pid_to, currency, new_balance_to)
+                new_balance_from = Float.round(balance - amount, 2)
+                Bucket.put(pid_from, currency, new_balance_from)
+                {:reply, {:ok, new_balance_from, new_balance_to}, state}
+
+              _ ->
+                {:reply, {:error, :receiver_does_not_exist}, state}
+            end
+
+          _balance ->
+            {:reply, {:error, :not_enough_money}, state}
+        end
+
+      _ ->
+        {:reply, {:error, :sender_does_not_exist}, state}
+    end
   end
 
   @impl true
