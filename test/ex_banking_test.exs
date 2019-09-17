@@ -87,7 +87,7 @@ defmodule ExBankingTest do
   test "limit transfer request" do
     ExBanking.create_user("first_user_limit")
     ExBanking.create_user("second_user_limit")
-    # Test limit request fof sender
+    # Test limit request for sender
     1..800_000 |> Enum.each(fn _ -> spawn(fn -> 
               ExBanking.deposit("first_user_limit", 1.0, "usd") end) end)
 
@@ -105,13 +105,13 @@ defmodule ExBankingTest do
 
   test "limit requests" do
     ExBanking.create_user("third_user_limit")
-    1..800_000 |> Enum.each(fn _ -> spawn(fn -> ExBanking.deposit("third_user_limit", 1, "usd") end) end)
+    1..800_000 |> Enum.each(fn _ -> spawn(fn -> ExBanking.deposit("third_user_limit", 1.0, "usd") end) end)
     assert ExBanking.get_balance("third_user_limit", "usd") == {:error, :too_many_requests_to_user}
   end
 
   test "negative amount not allowed" do
-    assert ExBanking.deposit(@first_user, -1, "usd") == {:error, :wrong_arguments}
-    assert ExBanking.send(@first_user, @second_user, -10, "usd") == {:error, :wrong_arguments}
-    assert ExBanking.withdraw(@second_user, -10, "usd") == {:error, :wrong_arguments}
+    assert ExBanking.deposit(@first_user, -1.0, "usd") == {:error, :wrong_arguments}
+    assert ExBanking.send(@first_user, @second_user, -10.0, "usd") == {:error, :wrong_arguments}
+    assert ExBanking.withdraw(@second_user, -10.0, "usd") == {:error, :wrong_arguments}
   end
 end
