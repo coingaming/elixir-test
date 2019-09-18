@@ -28,32 +28,37 @@ defmodule ExBanking do
   end
 
   @spec create_user(user :: String.t()) :: :ok | banking_error
-  def create_user(user) do
-    if not is_binary(user) do
-      {:error, :wrong_arguments}
-    end
-
+  def create_user(user) when is_binary(user) do
     Registry.create(@name, user)
+  end
+
+  @spec create_user(user :: String.t()) :: :ok | banking_error
+  def create_user(_user) do
+    {:error, :wrong_arguments}
   end
 
   @spec deposit(user :: String.t(), amount :: number, currency :: String.t()) ::
           {:ok, new_balance :: number} | banking_error
-  def deposit(user, amount, currency) do
-    if not is_number(amount) or amount < 0 do
-      {:error, :wrong_arguments}
-    else
-      Registry.deposit(@name, user, amount / 1, currency)
-    end
+  def deposit(user, amount, currency) when is_number(amount) and amount > 0 do
+    Registry.deposit(@name, user, amount / 1, currency)
+  end
+
+  @spec deposit(user :: String.t(), amount :: number, currency :: String.t()) ::
+          {:ok, new_balance :: number} | banking_error
+  def deposit(_user, _amount, _currency) do
+    {:error, :wrong_arguments}
   end
 
   @spec withdraw(user :: String.t(), amount :: number, currency :: String.t()) ::
           {:ok, new_balance :: number} | banking_error
-  def withdraw(user, amount, currency) do
-    if not is_number(amount) or amount < 0 do
-      {:error, :wrong_arguments}
-    else
-      Registry.withdraw(@name, user, amount, currency)
-    end
+  def withdraw(user, amount, currency) when is_number(amount) and amount > 0 do
+    Registry.withdraw(@name, user, amount, currency)
+  end
+
+  @spec withdraw(user :: String.t(), amount :: number, currency :: String.t()) ::
+          {:ok, new_balance :: number} | banking_error
+  def withdraw(_user, _amount, _currency) do
+    {:error, :wrong_arguments}
   end
 
   @spec get_balance(user :: String.t(), currency :: String.t()) ::
@@ -68,11 +73,18 @@ defmodule ExBanking do
           amount :: number,
           currency :: String.t()
         ) :: {:ok, from_user_balance :: number, to_user_balance :: number} | banking_error
-  def send(from_user, to_user, amount, currency) do
-    if not is_number(amount) or amount < 0 do
-      {:error, :wrong_arguments}
-    else
-      Registry.send(@name, from_user, to_user, amount / 1, currency)
-    end
+  def send(from_user, to_user, amount, currency) when is_number(amount) and amount > 0 do
+    Registry.send(@name, from_user, to_user, amount / 1, currency)
   end
+
+  @spec send(
+          from_user :: String.t(),
+          to_user :: String.t(),
+          amount :: number,
+          currency :: String.t()
+        ) :: {:ok, from_user_balance :: number, to_user_balance :: number} | banking_error
+  def send(_from_user, _to_user, _amount, _currency) do
+    {:error, :wrong_arguments}
+  end
+
 end
