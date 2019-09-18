@@ -1,4 +1,7 @@
 defmodule ExBanking.Registry do
+  @moduledoc """
+  GenServer module, contains client API and server callbacks
+  """
   use GenServer
   alias ExBanking.Bucket
   require IEx
@@ -126,33 +129,22 @@ defmodule ExBanking.Registry do
 
   @impl true
   def handle_call({:send, from, to, amount, currency}, _from, {accounts, _refs} = state) do
-    case Map.fetch(accounts, from) do
-      {:ok, pid_from} ->
-        case Bucket.get(pid_from, currency) do
-          nil ->
-            {:reply, {:error, :not_enough_money}, state}
+    case validate_balance(accounts, from, currency) do
+      {:ok, balance, account_from} when (balance >= amount) ->
+        case validate_balance(accounts, to, currency) do
+          {:ok, balance_to, account_to} ->
+            new_balance_to = Float.round(balance_to + amount, 2)
+            Bucket.put(account_to, currency, new_balance_to)
+            new_balance_from = Float.round(balance - amount, 2)
+            Bucket.put(account_from, currency, new_balance_from)
+            {:reply, {:ok, new_balance_from, new_balance_to}, state}
 
-          balance when balance >= amount ->
-            case Map.fetch(accounts, to) do
-              {:ok, pid_to} ->
-                new_balance_to =
-                  case Bucket.get(pid_to, currency) do
-                    nil -> Float.round(amount, 2)
-                    balance -> Float.round(balance + amount, 2)
-                  end
-
-                Bucket.put(pid_to, currency, new_balance_to)
-                new_balance_from = Float.round(balance - amount, 2)
-                Bucket.put(pid_from, currency, new_balance_from)
-                {:reply, {:ok, new_balance_from, new_balance_to}, state}
-
-              _ ->
-                {:reply, {:error, :receiver_does_not_exist}, state}
-            end
-
-          _balance ->
-            {:reply, {:error, :not_enough_money}, state}
+          _ ->
+            {:reply, {:error, :receiver_does_not_exist}, state}
         end
+
+      {:ok, balance, _account_from} when (balance < amount) ->
+        {:reply, {:error, :not_enough_money}, state}
 
       _ ->
         {:reply, {:error, :sender_does_not_exist}, state}
@@ -255,5 +247,17 @@ defmodule ExBanking.Registry do
   @impl true
   def handle_info(_msg, state) do
     {:noreply, state}
+  end
+
+  defp validate_balance(accounts, user, currency) do
+    case Map.fetch(accounts, user) do
+      {:ok, account} ->
+        case Bucket.get(account, currency) do
+          nil -> {:ok, 0.00, account}
+          balance -> {:ok, Float.round(balance, 2), account}
+        end
+      _ ->
+        {:error, :user_does_not_exist}
+    end
   end
 end

@@ -1,8 +1,13 @@
 defmodule ExBanking.Bucket do
+  @moduledoc """
+  Agent module, in memory storage
+  to keep the currency and balance
+  for a specific user
+  """
   use Agent, restart: :temporary
 
   @doc """
-  Starts a ew bucket
+  Starts a new bucket
   """
   def start_link(_opts) do
     Agent.start_link(fn -> %{} end)

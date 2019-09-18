@@ -1,4 +1,9 @@
 defmodule ExBanking.Supervisor do
+  @moduledoc """
+  Supervisor module, allow fault tolerant 
+  in case of fail guarantee that 
+  the application continue working
+  """
   use Supervisor
 
   def start_link(opts) do
