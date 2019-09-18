@@ -86,5 +86,4 @@ defmodule ExBanking do
   def send(_from_user, _to_user, _amount, _currency) do
     {:error, :wrong_arguments}
   end
-
 end
