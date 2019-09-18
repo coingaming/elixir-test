@@ -24,7 +24,8 @@ defmodule ExBanking.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
-      # {:credo, git: "https://github.com/rrrene/credo.git", tag: "v1.1.0"}
+      {:credo, git: "https://github.com/rrrene/credo.git", tag: "v1.1.0"},
+      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false}
     ]
   end
 end
