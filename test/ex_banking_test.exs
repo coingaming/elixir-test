@@ -87,25 +87,27 @@ defmodule ExBankingTest do
   test "limit transfer request" do
     ExBanking.create_user("first_user_limit")
     ExBanking.create_user("second_user_limit")
+    ExBanking.deposit("first_user_limit", 1000.00, "usd")
+    ExBanking.deposit("second_user_limit", 1000.00, "usd")
     # Test limit request for sender
-    1..800_000 |> Enum.each(fn _ -> spawn(fn -> 
+    1..800 |> Enum.each(fn _ -> spawn(fn -> 
               ExBanking.deposit("first_user_limit", 1.0, "usd") end) end)
 
     assert {:error, :too_many_requests_to_sender} == 
-            ExBanking.send("first_user_limit", "second_user_limit", 100.0, "usd")
+            ExBanking.send("first_user_limit", "second_user_limit", 1.0, "usd")
 
     # Test lmit request for receiver
-    1..800_000 |> Enum.each(fn _ -> spawn(fn -> 
+    1..1_000 |> Enum.each(fn _ -> spawn(fn -> 
               ExBanking.deposit("second_user_limit", 1.0, "usd") end) end)
 
     assert {:error, :too_many_requests_to_receiver} == 
-            ExBanking.send("first_user_limit", "second_user_limit", 100.0, "usd")
+            ExBanking.send("first_user_limit", "second_user_limit", 1.0, "usd")
              
   end
 
   test "limit requests" do
     ExBanking.create_user("third_user_limit")
-    1..800_000 |> Enum.each(fn _ -> spawn(fn -> ExBanking.deposit("third_user_limit", 1.0, "usd") end) end)
+    1..800 |> Enum.each(fn _ -> spawn(fn -> ExBanking.deposit("third_user_limit", 1.0, "usd") end) end)
     assert ExBanking.get_balance("third_user_limit", "usd") == {:error, :too_many_requests_to_user}
   end
 
