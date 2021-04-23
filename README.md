@@ -44,7 +44,7 @@ Requirements for public functions provided by `ExBanking` module. Any function s
 
 - Returns `balance` of the user in given format
 
-*@spec send(from_user :: String.t, to_user :: String.t, amount :: number, currency :: String.t) :: {:ok, from_user_balance :: number, to_user_balance :: number} \| {:error, :wrong_arguments \| :user_does_not_exist \| :not_enough_money \| :sender_does_not_exist \| :receiver_does_not_exist \| :too_many_requests_to_sender \| :too_many_requests_to_receiver}*
+*@spec send(from_user :: String.t, to_user :: String.t, amount :: number, currency :: String.t) :: {:ok, from_user_balance :: number, to_user_balance :: number} \| {:error, :wrong_arguments \| :not_enough_money \| :sender_does_not_exist \| :receiver_does_not_exist \| :too_many_requests_to_sender \| :too_many_requests_to_receiver}*
 
 - Decreases `from_user`'s balance in given `currency` by `amount` value
 - Increases `to_user`'s balance in given `currency` by `amount` value
