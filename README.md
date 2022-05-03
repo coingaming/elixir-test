@@ -56,10 +56,6 @@ Requirements for public functions provided by `ExBanking` module. Any function s
 - The system should be able to handle requests for different users in the same moment of time
 - Requests for user A should not affect to performance of requests to user B (maybe except `send` function when both A and B users are involved in the request)
 
-### Notes
-
-- Completed Elixir test tasks or questions related to the task can be sent to **HR@heathmont.net**
-
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-109361792-1"></script>
 <script>
